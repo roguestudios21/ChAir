@@ -24,8 +24,8 @@ class MultipeerManager: NSObject, ObservableObject {
     @Published var nearbyPeers: [MCPeerID] = []
     @Published var connectedPeers: [MCPeerID] = []
     @Published var messagesByRoom: [String: [ChatMessage]] = [
-        "General": [],
-        "Fun": [],
+        "Chat Room 1": [],
+        "Chat Room 2": [],
         "Private": []
     ]
     

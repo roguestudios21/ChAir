@@ -7,7 +7,8 @@ struct ChatRoomView: View {
     
     var body: some View {
         ZStack{
-            Color.accentColor
+            Image("bgImage")
+                .resizable()
                 .ignoresSafeArea()
         
         VStack {
@@ -16,29 +17,34 @@ struct ChatRoomView: View {
                     VStack(alignment: .leading, spacing: 8) {
                         ForEach(multipeer.messagesForRoom(roomName)) { msg in
                             VStack(alignment: msg.sender == "Me" ? .trailing : .leading, spacing: 2) {
+                                if msg.sender != "Me" {
+                                    Text(msg.sender)
+                                        .font(.subheadline)
+                                        .foregroundColor(.gray)
+                                        .padding(.horizontal, 4)
+                                }
+
                                 HStack {
                                     if msg.sender == "Me" {
                                         Spacer()
                                         Text(msg.text)
                                             .padding(10)
                                             .glassEffect(.clear.tint(.blue.opacity(0.7)))
-                                        //                                            .background(Color.blue)
-                                            .foregroundColor(.black)
-                                        //                                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                                            .foregroundColor(.white)
                                     } else {
-                                        Text("\(msg.sender): \(msg.text)")
+                                        Text(msg.text)
                                             .padding(10)
-                                            .glassEffect(.clear.tint(.green.opacity(0.7)))
-                                        //                                            .background(Color(.green))
-                                            .foregroundColor(.black)
-                                        //                                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                                            .glassEffect(.clear.tint(.blue.opacity(0.7)))
+                                            .foregroundColor(.white)
                                         Spacer()
                                     }
                                 }
+
                                 Text(msg.time.formatted(date: .omitted, time: .shortened))
                                     .font(.caption2)
                                     .foregroundColor(.gray)
                             }
+
                             .id(msg.id)
                         }
                     }
@@ -57,9 +63,9 @@ struct ChatRoomView: View {
             HStack(spacing: 12) {
                 TextField("Type your message...", text: $newMessage)
                     .padding(12)
-                    .glassEffect(.clear.tint((Color(.systemGray6)).opacity(0.7)))
-                //                    .background(Color(.systemGray6))
-                //                    .clipShape(RoundedRectangle(cornerRadius: 20))
+//                    .glassEffect(.clear.tint((Color(.systemGray6)).opacity(0.7)))
+                                    .background(Color(.systemGray6))
+                                    .clipShape(RoundedRectangle(cornerRadius: 20))
                 
                 Button(action: {
                     multipeer.send(message: newMessage, toRoom: roomName)
@@ -68,7 +74,7 @@ struct ChatRoomView: View {
                     Image(systemName: "paperplane.fill")
                         .foregroundColor(.white)
                         .padding(12)
-                        .glassEffect(.clear.tint(.blue.opacity(0.6)))
+                        .glassEffect(.clear.tint(.blue))
                     //                        .background(Color.accentColor)
                     //                        .clipShape(Circle())
                     //                        .shadow(radius: 2)
@@ -80,7 +86,7 @@ struct ChatRoomView: View {
             .padding(.bottom, 8)
         }
     }
-        .navigationTitle("\(roomName) Chat")
+        .navigationTitle("\(roomName)")
         .navigationBarTitleDisplayMode(.inline)
     
     }
@@ -88,11 +94,11 @@ struct ChatRoomView: View {
 
 #Preview {
     let manager = MultipeerManager()
-    manager.messagesByRoom["General"] = [
+    manager.messagesByRoom["Chat Room 1"] = [
         ChatMessage(text: "Hi!", sender: "Me", time: Date()),
         ChatMessage(text: "Hello!", sender: "Alice", time: Date())
     ]
     return NavigationView {
-        ChatRoomView(multipeer: manager, roomName: "General")
+        ChatRoomView(multipeer: manager, roomName: "Chat Room 1")
     }
 }

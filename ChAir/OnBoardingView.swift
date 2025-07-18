@@ -2,23 +2,55 @@
 //  OnBoardingView.swift
 //  ChAir
 //
-//  Created by Atharv  on 15/07/25.
+//  Created by Atharv on 15/07/25.
 //
 
 import SwiftUI
 
 struct OnBoardingView: View {
     @Binding var showOnboarding: Bool
-    
+
     var body: some View {
-        TabView{
-            WelcomePage(showOnboarding: $showOnboarding)
-                        FirstPage(showOnboarding: $showOnboarding)
-                        SecondPage(showOnboarding: $showOnboarding)
-                        ThirdPage(showOnboarding: $showOnboarding)
-        }.tabViewStyle(.page(indexDisplayMode: .always))
+        ZStack {
+            Color.black.opacity(0.4).ignoresSafeArea()
+
+            TabView {
+                OnboardingPage(imageName: "welcomePage", showOnboarding: $showOnboarding)
+                OnboardingPage(
+                    imageName: "firstPage",
+                    showOnboarding: $showOnboarding,
+                    description: """
+                    When you start the app, you are randomly assigned a username.
+
+                    You can choose to join a chatroom or have a one-on-one chat with another user in the network.
+                    """
+                )
+                OnboardingPage(
+                    imageName: "secondPage",
+                    showOnboarding: $showOnboarding,
+                    description: """
+                    Two secure chat rooms are always open join any time.
+
+                    Chats auto-delete when you leave.
+                    """
+                )
+                OnboardingPage(
+                    imageName: "thirdPage",
+                    showOnboarding: $showOnboarding,
+                    description: """
+                    Chat with anyone on the same network.
+
+                    Chats auto-delete when you or the other user leaves.
+                    """
+                )
+            }
+            .frame(width: 350, height: 700)
+            .cornerRadius(30)
+            .shadow(radius: 20)
+            .tabViewStyle(.page(indexDisplayMode: .always))
             .indexViewStyle(.page(backgroundDisplayMode: .always))
-            .ignoresSafeArea()
+        }
+        .transition(.opacity)
     }
 }
 
@@ -26,164 +58,70 @@ struct OnBoardingView: View {
     OnBoardingView(showOnboarding: .constant(true))
 }
 
-struct WelcomePage: View {
+struct OnboardingPage: View {
+    var imageName: String
     @Binding var showOnboarding: Bool
+    var description: String?
+
     var body: some View {
         ZStack {
-            Image("welcomePage")
+            Image(imageName)
                 .resizable()
                 .scaledToFill()
+                .frame(width: 350, height: 700)
+                .clipped()
+
+            if let description = description {
+                VStack {
+                    Spacer()
+                    InfoCard(text: description)
+                }
+            }
+
+            VStack {
+                HStack {
+                    Spacer()
+                    CloseButton {
+                        showOnboarding = false
+                    }
+                }
+                Spacer()
+            }
+            .padding(15)
         }
-        .overlay(
-            Button(action: { showOnboarding = false }) {
-                Image(systemName: "xmark")
-                    .padding()
-//                    .background(Color.white.opacity(0.7))
-//                    .clipShape(Circle())
-            }
-                .buttonStyle(.glassProminent)
-            .padding(.top, 75) // move lower
-            .padding(.leading),
-            alignment: .topLeading
-        )
+        .frame(width: 350, height: 700)
     }
 }
 
+struct CloseButton: View {
+    let action: () -> Void
 
-struct FirstPage: View {
-    @Binding var showOnboarding: Bool
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: "xmark")
+                .padding(10)
+        }
+        .buttonStyle(.glassProminent)
+    }
+}
+
+struct InfoCard: View {
+    let text: String
+
     var body: some View {
         ZStack {
-            Image("firstPage")
-                .resizable()
-                .scaledToFill()
-            
-            VStack {
-                Spacer()
-                
-                ZStack {
-                    Rectangle()
-                        .fill(Color.accentColor)
-                        .frame(height: 300)
-                    
-                    Text("""
-                        When you start the app, you are randomly assigned a username.
-                        
-                        You can choose to join a chatroom or have a one-on-one chat with another user in the network.
-                        """)
-                        .foregroundColor(.white)
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                        .multilineTextAlignment(.leading)
-                        .lineSpacing(6)
-                        .padding(.bottom, 75)
-                        .padding()
-                }
-               
-            }
-            
-        }.overlay(
-            Button(action: { showOnboarding = false }) {
-                Image(systemName: "xmark")
-                    .padding()
-//                    .background(Color.white.opacity(0.7))
-//                    .clipShape(Circle())
-            }
-                .buttonStyle(.glassProminent)
-                .padding(.top, 75)
-                .padding(),
-            alignment: .topLeading
-        )
-    }
-}
+            Rectangle()
+                .fill(Color.accentColor)
+                .frame(height: 225)
+                .cornerRadius(10)
 
-struct SecondPage: View {
-    @Binding var showOnboarding: Bool
-    var body: some View{
-        ZStack{
-            Image("secondPage")
-                .resizable()
-                .scaledToFill()
-            VStack {
-                Spacer()
-                
-                ZStack {
-                    Rectangle()
-                        .fill(Color.accentColor)
-                        .frame(height: 300)
-                    
-                    Text("""
-                        Two secure chat rooms are always open join any time.
-                        
-                        Chats auto-delete when you leave.
-                        
-                        """)
-                        .foregroundColor(.white)
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                        .multilineTextAlignment(.leading)
-                        .lineSpacing(6)
-                        .padding(.bottom, 75)
-                        .padding()
-                }
-                
-            }
-        }.overlay(
-            Button(action: { showOnboarding = false }) {
-                Image(systemName: "xmark")
-                    .padding()
-//                    .background(Color.white.opacity(0.7))
-//                    .clipShape(Circle())
-            }
-                .buttonStyle(.glassProminent)
-                .padding(.top, 75)
-                .padding(),
-            alignment: .topLeading
-        )
-    }
-}
-
-struct ThirdPage: View {
-    @Binding var showOnboarding: Bool
-    var body: some View{
-        ZStack{
-            Image("thirdPage")
-                .resizable()
-                .scaledToFill()
-            VStack {
-                Spacer()
-                
-                ZStack {
-                    Rectangle()
-                        .fill(Color.accentColor)
-                        .frame(height: 300)
-                    
-                    Text("""
-                        Chat with anyone on the same network.
-                        
-                        Chats auto-delete when you or the other user leaves.
-                        """)
-                        .foregroundColor(.white)
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                        .multilineTextAlignment(.leading)
-                        .lineSpacing(6)
-                        .padding(.bottom, 75)
-                        .padding()
-                }
-                
-            }
-        }.overlay(
-            Button(action: { showOnboarding = false }) {
-                Image(systemName: "xmark")
-                    .padding()
-//                    .background(Color.white.opacity(0.7))
-//                    .clipShape(Circle())
-            }
-                .buttonStyle(.glassProminent)
-                .padding(.top, 75)
-                .padding(),
-            alignment: .topLeading
-        )
+            Text(text)
+                .foregroundColor(.white)
+                .font(.body)
+                .fontWeight(.semibold)
+                .multilineTextAlignment(.leading)
+                .lineSpacing(6)
+                .padding()
+        }
     }
 }

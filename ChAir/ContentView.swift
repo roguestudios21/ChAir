@@ -14,59 +14,56 @@ struct AlertItem: Identifiable {
 struct ContentView: View {
     @StateObject private var multipeer = MultipeerManager()
     @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
-    
+
     var body: some View {
         ZStack {
-           
             NavigationView {
-                List {
-                    Section(header: Text("Chatrooms")) {
-                        NavigationLink("General") {
-                            ChatRoomView(multipeer: multipeer, roomName: "General")
-                        }
-                        NavigationLink("Fun") {
-                            ChatRoomView(multipeer: multipeer, roomName: "Fun")
-                        }
-                    }
+                ZStack {
+                    Image("bgImage")
+                        .resizable()
+                        .ignoresSafeArea()
                     
-                    Section(header: Text("Nearby Users")) {
-                        if multipeer.nearbyPeers.isEmpty {
-                            Text("No user nearby")
-                                .foregroundColor(.secondary)
-                        } else {
-                            ForEach(multipeer.nearbyPeers, id: \.self) { peer in
-                                NavigationLink(destination: PrivateChatView(multipeer: multipeer)) {
-                                    HStack {
-                                        Text(peer.displayName)
-                                        Spacer()
-                                        Button(action: {
-                                            multipeer.invite(peer)
-                                        }) {
-                                            Image(systemName: "person.badge.plus")
+                    List {
+                        Section(header: Text("Chatrooms").foregroundColor(.white)) {
+                            NavigationLink("Chat Room 1") {
+                                ChatRoomView(multipeer: multipeer, roomName: "Chat Room 1")
+                            }
+                            NavigationLink("Chat Room 2") {
+                                ChatRoomView(multipeer: multipeer, roomName: "Chat Room 2")
+                            }
+                        }
+                        
+                        Section(header: Text("Available Users").foregroundColor(.white)) {
+                            if multipeer.nearbyPeers.isEmpty {
+                                Text("No users available")
+                                    .foregroundColor(.secondary)
+                            } else {
+                                ForEach(multipeer.nearbyPeers, id: \.self) { peer in
+                                    NavigationLink(destination: PrivateChatView(multipeer: multipeer, peer: peer)) {
+                                        HStack {
+                                            Text(peer.displayName)
+                                            Spacer()
+                                            Image(systemName: "chevron.right")
+                                                .foregroundColor(.gray)
                                         }
-                                        .buttonStyle(BorderlessButtonStyle())
                                     }
+                                    .simultaneousGesture(TapGesture().onEnded {
+                                        multipeer.invite(peer)
+                                    })
                                 }
                             }
                         }
                     }
-                    
-                    Section(header: Text("Connected Users")) {
-                        if multipeer.connectedPeers.isEmpty {
-                            Text("No user connected yet")
-                                .foregroundColor(.secondary)
-                        } else {
-                            ForEach(multipeer.connectedPeers, id: \.self) { peer in
-                                NavigationLink(destination: PrivateChatView(multipeer: multipeer)) {
-                                    Text(peer.displayName)
-                                }
-                            }
-                        }
-                    }
+                    .scrollContentBackground(.hidden)
+                    .background(Color.clear)
+                    .listStyle(InsetGroupedListStyle())
                 }
-                
                 .navigationTitle("\(UsernameManager.shared.username)")
+                .navigationBarTitleDisplayMode(.inline)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .blur(radius: hasSeenOnboarding ? 0 : 8) // Apply blur conditionally
+
             if !hasSeenOnboarding {
                 OnBoardingView(showOnboarding: Binding(
                     get: { !hasSeenOnboarding },
