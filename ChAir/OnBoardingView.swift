@@ -38,10 +38,10 @@ struct WelcomePage: View {
             Button(action: { showOnboarding = false }) {
                 Image(systemName: "xmark")
                     .padding()
-//                    .background(Color.white.opacity(0.7))
-//                    .clipShape(Circle())
+                    .background(Color.white.opacity(0.7))
+                    .clipShape(Circle())
             }
-                .buttonStyle(.glassProminent)
+              
             .padding(.top, 75) // move lower
             .padding(.leading),
             alignment: .topLeading
@@ -86,10 +86,10 @@ struct FirstPage: View {
             Button(action: { showOnboarding = false }) {
                 Image(systemName: "xmark")
                     .padding()
-//                    .background(Color.white.opacity(0.7))
-//                    .clipShape(Circle())
+                    .background(Color.white.opacity(0.7))
+                    .clipShape(Circle())
             }
-                .buttonStyle(.glassProminent)
+               
                 .padding(.top, 75)
                 .padding(),
             alignment: .topLeading
@@ -132,10 +132,10 @@ struct SecondPage: View {
             Button(action: { showOnboarding = false }) {
                 Image(systemName: "xmark")
                     .padding()
-//                    .background(Color.white.opacity(0.7))
-//                    .clipShape(Circle())
+                    .background(Color.white.opacity(0.7))
+                    .clipShape(Circle())
             }
-                .buttonStyle(.glassProminent)
+               
                 .padding(.top, 75)
                 .padding(),
             alignment: .topLeading
@@ -177,10 +177,9 @@ struct ThirdPage: View {
             Button(action: { showOnboarding = false }) {
                 Image(systemName: "xmark")
                     .padding()
-//                    .background(Color.white.opacity(0.7))
-//                    .clipShape(Circle())
+                    .background(Color.white.opacity(0.7))
+                    .clipShape(Circle())
             }
-                .buttonStyle(.glassProminent)
                 .padding(.top, 75)
                 .padding(),
             alignment: .topLeading
