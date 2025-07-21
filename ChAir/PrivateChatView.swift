@@ -21,3 +21,10 @@ struct PrivateChatView: View {
         .navigationBarTitleDisplayMode(.inline)
     }
 }
+
+
+#Preview("PrivateChatView Preview", traits: .sizeThatFitsLayout) {
+    NavigationStack {
+        PrivateChatView(multipeer: MockMultipeerManager(), peer: MCPeerID(displayName: "Bob"))
+    }
+}

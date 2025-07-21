@@ -15,8 +15,7 @@ struct VoiceChatRoomBody: View {
     let isPrivate: Bool
 
     @State private var newMessage = ""
-    @State private var isRecording = false
-    @State private var audioRecorder: AVAudioRecorder?
+    @StateObject private var recorderManager = AudioRecorderManager()
 
     var body: some View {
         VStack {
@@ -64,14 +63,21 @@ struct VoiceChatRoomBody: View {
             }
 
             VStack(spacing: 4) {
-                if isRecording {
-                    SoundWaveView()
-                        .frame(height: 60)
-                        .frame(maxWidth: 150)
-                        .glassEffect(.clear.tint(Color.blue.opacity(0.7)))
-                        .padding(.horizontal)
-                        .transition(.opacity)
-                        .animation(.easeInOut, value: isRecording)
+                if recorderManager.isRecording {
+                    HStack {
+                        SoundWaveView()
+                            .animation(.easeInOut, value: recorderManager.isRecording)
+
+                        Text("\(recorderManager.recordingTimeLeft)")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .bold()
+                    }
+                    .frame(height: 60)
+                    .frame(maxWidth: 150)
+                    .glassEffect(.clear.tint(Color.blue.opacity(0.7)))
+                    .transition(.opacity)
+                    .padding(.horizontal)
                 }
 
                 HStack(spacing: 12) {
@@ -91,12 +97,21 @@ struct VoiceChatRoomBody: View {
                     }
 
                     Button(action: {
-                        toggleRecording()
+                        if recorderManager.isRecording {
+                            recorderManager.stopRecording()
+                        } else {
+                            recorderManager.onFinish = { data in
+                                if let data = data {
+                                    multipeer.sendVoice(data, toRoom: roomKey)
+                                }
+                            }
+                            recorderManager.startRecording()
+                        }
                     }) {
-                        Image(systemName: isRecording ? "stop.fill" : "mic.fill")
+                        Image(systemName: recorderManager.isRecording ? "stop.fill" : "mic.fill")
                             .foregroundColor(.white)
                             .padding(12)
-                            .glassEffect(isRecording ? .clear.tint(.red) : .clear.tint(.blue))
+                            .glassEffect(recorderManager.isRecording ? .clear.tint(.red) : .clear.tint(.blue))
                     }
                 }
                 .padding(.horizontal)
@@ -104,8 +119,6 @@ struct VoiceChatRoomBody: View {
                 .shadow(radius: 5)
                 .padding(.bottom, 8)
             }
-
-
         }
     }
 
@@ -121,55 +134,6 @@ struct VoiceChatRoomBody: View {
         } else {
             Text("[Unsupported]")
                 .foregroundColor(.red)
-        }
-    }
-
-    func toggleRecording() {
-        if isRecording {
-            stopRecording()
-        } else {
-            startRecording()
-        }
-    }
-
-    func startRecording() {
-        do {
-            try AVAudioSession.sharedInstance().setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker])
-            try AVAudioSession.sharedInstance().setActive(true)
-        } catch {
-            print("Failed to set up audio session for recording: \(error)")
-        }
-
-        let settings = [
-            AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
-            AVSampleRateKey: 12000,
-            AVNumberOfChannelsKey: 1,
-            AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
-        ]
-
-        let fileName = UUID().uuidString + ".m4a"
-        let fileURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
-
-        do {
-            audioRecorder = try AVAudioRecorder(url: fileURL, settings: settings)
-            audioRecorder?.record(forDuration: 10)
-            isRecording = true
-        } catch {
-            print("Failed to start recording: \(error)")
-        }
-    }
-
-    func stopRecording() {
-        audioRecorder?.stop()
-        isRecording = false
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            if let url = audioRecorder?.url, let data = try? Data(contentsOf: url) {
-                print("Audio data size: \(data.count)")
-                multipeer.sendVoice(data, toRoom: roomKey)
-            } else {
-                print("Failed to get audio data from URL")
-            }
         }
     }
 }

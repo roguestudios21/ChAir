@@ -34,7 +34,7 @@ struct VoiceMessagePlayer: View {
                         .foregroundColor(.white)
                 }
 
-                Text(isPlaying ? "playing" : "Audio")
+                Text(isPlaying ? "Playing" : "Audio")
                     .foregroundColor(.white)
                     .fontWeight(.medium)
             }
