@@ -22,26 +22,28 @@ struct VoiceMessagePlayer: View {
                 playAudio()
             }
         }) {
-            HStack {
-                ZStack {
-                    Circle()
-                        .fill(isPlaying ? Color.green.opacity(0.3) : Color.blue.opacity(0.3))
-                        .frame(width: 44, height: 44)
-                        .scaleEffect(animateWave ? 1.2 : 1.0)
-                        .animation(animateWave ? .easeInOut(duration: 0.6).repeatForever(autoreverses: true) : .default, value: animateWave)
-
-                    Image(systemName: isPlaying ? "stop.circle.fill" : "play.circle.fill")
+            HStack(spacing: 4) {
+                if isPlaying {
+                    SoundWaveView()
+                        .frame(height: 24)
+                        .transition(.opacity)
+                } else {
+                    Image(systemName: "play.circle.fill")
                         .font(.title)
+//                        .glassEffect(.clear)
                         .foregroundColor(.white)
                 }
 
-                Text(isPlaying ? "Playing..." : "Play Voice")
+                Text(isPlaying ? "playing" : "Audio")
                     .foregroundColor(.white)
                     .fontWeight(.medium)
             }
             .padding(8)
-            .background(Color.black.opacity(0.3))
-            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .glassEffect(.clear.tint(Color.blue.opacity(0.7)))
+//            .background(Color.black.opacity(0.3))
+//            .clipShape(RoundedRectangle(cornerRadius: 10))
+            
+
         }
     }
 
@@ -76,5 +78,47 @@ struct VoiceMessagePlayer: View {
         player?.stop()
         isPlaying = false
         animateWave = false
+    }
+    
+    
+}
+
+#Preview("VoiceMessagePlayer Preview", traits: .sizeThatFitsLayout) {
+    if let url = Bundle.main.url(forResource: "testaudio", withExtension: "m4a"),
+       let data = try? Data(contentsOf: url) {
+        VoiceMessagePlayer(audioData: data)
+            .padding()
+            .background(Color.gray)
+    } else {
+        Text("❌ testaudio.m4a not found in bundle")
+            .foregroundColor(.red)
+            .padding()
+    }
+}
+
+struct SoundWaveView: View {
+    @State private var heights: [CGFloat] = Array(repeating: 10, count: 5)
+
+    var body: some View {
+        HStack(alignment: .center, spacing: 4) {
+            ForEach(0..<heights.count, id: \.self) { index in
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(Color.white)
+                    .frame(width: 4, height: heights[index])
+            }
+        }
+        .onAppear {
+            withAnimation(Animation.linear(duration: 0.2).repeatForever(autoreverses: true)) {
+                animateWave()
+            }
+        }
+    }
+
+    func animateWave() {
+        Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { _ in
+            for i in 0..<heights.count {
+                heights[i] = CGFloat.random(in: 8...24)
+            }
+        }
     }
 }

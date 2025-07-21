@@ -63,35 +63,49 @@ struct VoiceChatRoomBody: View {
                 }
             }
 
-            HStack(spacing: 12) {
-                TextField("Type your message...", text: $newMessage)
-                    .padding(12)
-                    .background(Color(.systemGray6))
-                    .clipShape(RoundedRectangle(cornerRadius: 20))
+            VStack(spacing: 4) {
+                if isRecording {
+                    SoundWaveView()
+                        .frame(height: 60)
+                        .frame(maxWidth: 150)
+                        .glassEffect(.clear.tint(Color.blue.opacity(0.7)))
+                        .padding(.horizontal)
+                        .transition(.opacity)
+                        .animation(.easeInOut, value: isRecording)
+                }
 
-                Button(action: {
-                    multipeer.send(message: newMessage, toRoom: roomKey)
-                    newMessage = ""
-                }) {
-                    Image(systemName: "paperplane.fill")
-                        .foregroundColor(.white)
+                HStack(spacing: 12) {
+                    TextField("Type your message...", text: $newMessage)
                         .padding(12)
-                        .glassEffect(.clear.tint(.blue))
-                }
+                        .background(Color(.systemGray6))
+                        .clipShape(RoundedRectangle(cornerRadius: 20))
 
-                Button(action: {
-                    toggleRecording()
-                }) {
-                    Image(systemName: isRecording ? "stop.circle.fill" : "mic.circle.fill")
-                        .font(.system(size: 30))
-                        .foregroundColor(isRecording ? .red : .white)
-                        .glassEffect(.clear.tint(.blue))
+                    Button(action: {
+                        multipeer.send(message: newMessage, toRoom: roomKey)
+                        newMessage = ""
+                    }) {
+                        Image(systemName: "paperplane.fill")
+                            .foregroundColor(.white)
+                            .padding(12)
+                            .glassEffect(.clear.tint(.blue))
+                    }
+
+                    Button(action: {
+                        toggleRecording()
+                    }) {
+                        Image(systemName: isRecording ? "stop.fill" : "mic.fill")
+                            .foregroundColor(.white)
+                            .padding(12)
+                            .glassEffect(isRecording ? .clear.tint(.red) : .clear.tint(.blue))
+                    }
                 }
+                .padding(.horizontal)
+                .padding(.vertical, 8)
+                .shadow(radius: 5)
+                .padding(.bottom, 8)
             }
-            .padding(.horizontal)
-            .padding(.vertical, 8)
-            .shadow(radius: 5)
-            .padding(.bottom, 8)
+
+
         }
     }
 
