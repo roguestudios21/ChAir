@@ -1,8 +1,3 @@
-//
-//  MultipeerManager.swift
-//  ChAir
-//
-
 import Foundation
 import MultipeerConnectivity
 import Combine
@@ -23,12 +18,7 @@ class MultipeerManager: NSObject, ObservableObject {
     
     @Published var nearbyPeers: [MCPeerID] = []
     @Published var connectedPeers: [MCPeerID] = []
-    @Published var messagesByRoom: [String: [ChatMessage]] = [
-        "Chat Room 1": [],
-        "Chat Room 2": [],
-        "Private": []
-    ]
-    
+    @Published var messagesByRoom: [String: [ChatMessage]] = [:]
     @Published var alertItem: AlertItem? = nil
     
     private var session: MCSession
@@ -48,21 +38,25 @@ class MultipeerManager: NSObject, ObservableObject {
         serviceBrowser.startBrowsingForPeers()
     }
     
+    func privateRoomKey(for peer: MCPeerID) -> String {
+        return "Private-\(peer.displayName)"
+    }
+    
     func send(message: String, toRoom room: String) {
         let newMsg = ChatMessage(text: message, sender: "Me", time: Date())
         messagesByRoom[room, default: []].append(newMsg)
-
-        if !session.connectedPeers.isEmpty,
-           let data = "\(room):\(message)".data(using: .utf8) {
-            do {
-                try session.send(data, toPeers: session.connectedPeers, with: .reliable)
-            } catch {
-                DispatchQueue.main.async {
-                    self.alertItem = AlertItem(message: "Couldn’t send your message. Please try again.")
-                }
+        
+        guard let data = "\(room):\(message)".data(using: .utf8) else { return }
+        
+        if room.starts(with: "Private-") {
+            if let targetPeer = connectedPeers.first(where: { room == privateRoomKey(for: $0) }) {
+                try? session.send(data, toPeers: [targetPeer], with: .reliable)
             }
+        } else {
+            try? session.send(data, toPeers: session.connectedPeers, with: .reliable)
         }
     }
+
 
     func messagesForRoom(_ room: String) -> [ChatMessage] {
         return messagesByRoom[room] ?? []
@@ -92,8 +86,7 @@ extension MultipeerManager: MCSessionDelegate, MCNearbyServiceAdvertiserDelegate
             }
         }
     }
-    
-    // Unused delegate methods
+
     func session(_ session: MCSession, didReceive stream: InputStream, withName: String, fromPeer: MCPeerID) {}
     func session(_ session: MCSession, didStartReceivingResourceWithName: String, fromPeer: MCPeerID, with: Progress) {}
     func session(_ session: MCSession, didFinishReceivingResourceWithName: String, fromPeer: MCPeerID, at: URL?, withError: Error?) {}

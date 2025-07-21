@@ -6,6 +6,10 @@ struct PrivateChatView: View {
     var peer: MCPeerID
     @State private var newMessage = ""
 
+    private var roomKey: String {
+        multipeer.privateRoomKey(for: peer)
+    }
+
     var body: some View {
         ZStack {
             Image("bgImage")
@@ -16,7 +20,7 @@ struct PrivateChatView: View {
                 ScrollViewReader { proxy in
                     ScrollView {
                         VStack(alignment: .leading, spacing: 8) {
-                            ForEach(multipeer.messagesForRoom("Private")) { msg in
+                            ForEach(multipeer.messagesForRoom(roomKey)) { msg in
                                 VStack(alignment: msg.sender == "Me" ? .trailing : .leading, spacing: 2) {
                                     HStack {
                                         if msg.sender == "Me" {
@@ -43,24 +47,24 @@ struct PrivateChatView: View {
                         .padding(.horizontal)
                         .padding(.top, 8)
                     }
-                    .onChange(of: multipeer.messagesForRoom("Private").count) {
-                        if let last = multipeer.messagesForRoom("Private").last {
+                    .onChange(of: multipeer.messagesForRoom(roomKey).count) {
+                        if let last = multipeer.messagesForRoom(roomKey).last {
                             withAnimation {
                                 proxy.scrollTo(last.id, anchor: .bottom)
                             }
                         }
                     }
+
                 }
 
                 HStack(spacing: 12) {
                     TextField("Type your message...", text: $newMessage)
                         .padding(12)
-//                        .glassEffect(.clear.tint((Color(.systemGray6)).opacity(0.7)))
                         .background(Color(.systemGray6))
                         .clipShape(RoundedRectangle(cornerRadius: 20))
 
                     Button(action: {
-                        multipeer.send(message: newMessage, toRoom: "Private")
+                        multipeer.send(message: newMessage, toRoom: roomKey)
                         newMessage = ""
                     }) {
                         Image(systemName: "paperplane.fill")
@@ -75,20 +79,18 @@ struct PrivateChatView: View {
                 .padding(.bottom, 8)
             }
         }
-        
         .navigationTitle(peer.displayName)
         .navigationBarTitleDisplayMode(.inline)
     }
 }
 
-
 #Preview {
     let manager = MultipeerManager()
-    manager.messagesByRoom["Private"] = [
+    let mockPeer = MCPeerID(displayName: "Bob")
+    manager.messagesByRoom["Private-Bob"] = [
         ChatMessage(text: "Hey there!", sender: "Me", time: Date()),
         ChatMessage(text: "Hello!", sender: "Bob", time: Date())
     ]
-    let mockPeer = MCPeerID(displayName: "Bob")
     return NavigationView {
         PrivateChatView(multipeer: manager, peer: mockPeer)
     }
