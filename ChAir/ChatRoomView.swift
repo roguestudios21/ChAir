@@ -7,9 +7,9 @@ struct ChatRoomView: View {
 
     var body: some View {
         ZStack {
-            Image("bgImage")
-                .resizable()
-                .ignoresSafeArea()
+//            Image("bgImage")
+//                .resizable()
+//                .ignoresSafeArea()
 
             VoiceChatRoomBody(multipeer: multipeer, roomKey: roomName, showSenderName: true, isPrivate: false)
         }

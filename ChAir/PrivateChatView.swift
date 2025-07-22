@@ -11,9 +11,9 @@ struct PrivateChatView: View {
 
     var body: some View {
         ZStack {
-            Image("bgImage")
-                .resizable()
-                .ignoresSafeArea()
+//            Image("bgImage")
+//                .resizable()
+//                .ignoresSafeArea()
 
             VoiceChatRoomBody(multipeer: multipeer, roomKey: roomKey, showSenderName: false, isPrivate: true)
         }
