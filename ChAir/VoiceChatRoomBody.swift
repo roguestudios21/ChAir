@@ -75,9 +75,13 @@ struct VoiceChatRoomBody: View {
                     }
                     .frame(height: 60)
                     .frame(maxWidth: 150)
-                    .glassEffect(.clear.tint(Color.blue.opacity(0.7)))
+//                    .glassEffect(.clear.tint(Color.blue.opacity(0.7)))
+                    .background(.blue)
+                    .clipShape(RoundedRectangle(cornerRadius: 30))
                     .transition(.opacity)
                     .padding(.horizontal)
+                    
+                    
                 }
 
                 HStack(spacing: 12) {
@@ -93,7 +97,9 @@ struct VoiceChatRoomBody: View {
                         Image(systemName: "paperplane.fill")
                             .foregroundColor(.white)
                             .padding(12)
-                            .glassEffect(.clear.tint(.blue))
+//                            .glassEffect(.clear.tint(.blue))
+                            .background(.blue)
+                            .clipShape(Capsule())
                     }
 
                     Button(action: {
@@ -111,7 +117,9 @@ struct VoiceChatRoomBody: View {
                         Image(systemName: recorderManager.isRecording ? "stop.fill" : "mic.fill")
                             .foregroundColor(.white)
                             .padding(12)
-                            .glassEffect(recorderManager.isRecording ? .clear.tint(.red) : .clear.tint(.blue))
+                            .background(recorderManager.isRecording ? Color.red : Color.blue)
+//                            .glassEffect(recorderManager.isRecording ? .clear.tint(.red) : .clear.tint(.blue))
+                            .clipShape(Capsule())
                     }
                 }
                 .padding(.horizontal)
@@ -127,8 +135,10 @@ struct VoiceChatRoomBody: View {
         if let text = msg.text {
             Text(text)
                 .padding(10)
-                .glassEffect(.clear.tint(.blue.opacity(0.7)))
+                .background(Color.blue)
+//                .glassEffect(.clear.tint(.blue.opacity(0.7)))
                 .foregroundColor(.white)
+                .clipShape(Capsule())
         } else if let voice = msg.audioData {
             VoiceMessagePlayer(audioData: voice)
         } else {

@@ -39,9 +39,9 @@ struct VoiceMessagePlayer: View {
                     .fontWeight(.medium)
             }
             .padding(8)
-            .glassEffect(.clear.tint(Color.blue.opacity(0.7)))
-//            .background(Color.black.opacity(0.3))
-//            .clipShape(RoundedRectangle(cornerRadius: 10))
+//            .glassEffect(.clear.tint(Color.blue.opacity(0.7)))
+            .background(Color.blue.opacity(0.8))
+            .clipShape(RoundedRectangle(cornerRadius: 30))
             
 
         }
