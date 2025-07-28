@@ -67,7 +67,6 @@ struct CloseButton: View {
             Image(systemName: "xmark")
                 .padding(10)
         }
-//        .buttonStyle(.glassProminent)
         .buttonStyle(.bordered)
     }
 }

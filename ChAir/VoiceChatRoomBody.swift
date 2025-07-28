@@ -75,7 +75,6 @@ struct VoiceChatRoomBody: View {
                     }
                     .frame(height: 60)
                     .frame(maxWidth: 150)
-//                    .glassEffect(.clear.tint(Color.blue.opacity(0.7)))
                     .background(.blue)
                     .clipShape(RoundedRectangle(cornerRadius: 30))
                     .transition(.opacity)
@@ -87,7 +86,7 @@ struct VoiceChatRoomBody: View {
                 HStack(spacing: 12) {
                     TextField("Type your message...", text: $newMessage)
                         .padding(12)
-                        .background(Color(.systemGray6))
+                        .background(Color.gray.opacity(0.1))
                         .clipShape(RoundedRectangle(cornerRadius: 20))
 
                     Button(action: {
@@ -97,7 +96,6 @@ struct VoiceChatRoomBody: View {
                         Image(systemName: "paperplane.fill")
                             .foregroundColor(.white)
                             .padding(12)
-//                            .glassEffect(.clear.tint(.blue))
                             .background(.blue)
                             .clipShape(Capsule())
                     }
@@ -118,7 +116,6 @@ struct VoiceChatRoomBody: View {
                             .foregroundColor(.white)
                             .padding(12)
                             .background(recorderManager.isRecording ? Color.red : Color.blue)
-//                            .glassEffect(recorderManager.isRecording ? .clear.tint(.red) : .clear.tint(.blue))
                             .clipShape(Capsule())
                     }
                 }
@@ -136,7 +133,6 @@ struct VoiceChatRoomBody: View {
             Text(text)
                 .padding(10)
                 .background(Color.blue)
-//                .glassEffect(.clear.tint(.blue.opacity(0.7)))
                 .foregroundColor(.white)
                 .clipShape(Capsule())
         } else if let voice = msg.audioData {

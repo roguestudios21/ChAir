@@ -30,16 +30,14 @@ struct VoiceMessagePlayer: View {
                 } else {
                     Image(systemName: "play.circle.fill")
                         .font(.title)
-//                        .glassEffect(.clear)
-                        .foregroundColor(.white)
+                        .foregroundColor(.secondary)
                 }
 
                 Text(isPlaying ? "Playing" : "Audio")
-                    .foregroundColor(.white)
+                    .foregroundColor(.secondary)
                     .fontWeight(.medium)
             }
             .padding(8)
-//            .glassEffect(.clear.tint(Color.blue.opacity(0.7)))
             .background(Color.blue.opacity(0.8))
             .clipShape(RoundedRectangle(cornerRadius: 30))
             
@@ -103,7 +101,7 @@ struct SoundWaveView: View {
         HStack(alignment: .center, spacing: 4) {
             ForEach(0..<heights.count, id: \.self) { index in
                 RoundedRectangle(cornerRadius: 2)
-                    .fill(Color.white)
+                    .fill(Color.secondary)
                     .frame(width: 4, height: heights[index])
             }
         }

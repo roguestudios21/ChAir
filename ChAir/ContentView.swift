@@ -48,7 +48,7 @@ struct ContentView: View {
                             }
                         }
                         .padding(15)
-                        .background(Color(.systemGray6))
+                        .background(Color.gray.opacity(0.1))
                         .cornerRadius(10)
                         .transition(.move(edge: .top).combined(with: .opacity))
                         .listRowInsets(EdgeInsets())
@@ -113,9 +113,13 @@ struct ContentView: View {
                 } else {
                     VStack {
                         Spacer()
-                        Text("Welcome to ChAir")
-                            .font(.largeTitle)
-                            .foregroundColor(.gray)
+                        Text("ChatOverAir")
+                        .font(.largeTitle)
+                        .foregroundColor(.secondary)
+                        
+                        Text("An App that allows you to chat anonymously over Air")
+                            .font(.title2)
+                            .foregroundColor(.secondary)
                         Spacer()
                     }
                 }

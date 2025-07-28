@@ -1,17 +1,10 @@
-//
-//  AudioRecorderManager.swift
-//  ChAir
-//
-//  Created by Atharv on 21/07/25.
-//
-
 import Foundation
 import AVFoundation
 import Combine
 
 class AudioRecorderManager: NSObject, AVAudioRecorderDelegate, ObservableObject {
     @Published var isRecording = false
-    @Published var recordingTimeLeft = 15
+    @Published var recordingTimeLeft = 8
 
     private var audioRecorder: AVAudioRecorder?
     private var timer: Timer?
@@ -28,7 +21,7 @@ class AudioRecorderManager: NSObject, AVAudioRecorderDelegate, ObservableObject 
 
         let settings = [
             AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
-            AVSampleRateKey: 12000,
+            AVSampleRateKey: 8000,
             AVNumberOfChannelsKey: 1,
             AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
         ]
@@ -38,9 +31,9 @@ class AudioRecorderManager: NSObject, AVAudioRecorderDelegate, ObservableObject 
         do {
             audioRecorder = try AVAudioRecorder(url: fileURL, settings: settings)
             audioRecorder?.delegate = self
-            audioRecorder?.record(forDuration: 15)
+            audioRecorder?.record(forDuration: 8)
             isRecording = true
-            recordingTimeLeft = 15
+            recordingTimeLeft = 8
 
             timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
                 guard let self = self else { return }

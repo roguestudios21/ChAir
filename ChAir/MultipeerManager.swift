@@ -47,7 +47,8 @@ class MultipeerManager: NSObject, ObservableObject {
     }
 
     func privateRoomKey(for peer: MCPeerID) -> String {
-        return "Private-\(peer.displayName)"
+        let names = [peer.displayName, myPeerId.displayName].sorted()
+        return "Private-\(names[0])-\(names[1])"
     }
 
     func send(message: String, toRoom room: String) {
@@ -75,9 +76,9 @@ class MultipeerManager: NSObject, ObservableObject {
 
         if room.starts(with: "Private-"),
            let peer = connectedPeers.first(where: { room == privateRoomKey(for: $0) }) {
-            try? session.send(messageData, toPeers: [peer], with: .reliable)
+            try? session.send(messageData, toPeers: [peer], with: .unreliable)
         } else {
-            try? session.send(messageData, toPeers: session.connectedPeers, with: .reliable)
+            try? session.send(messageData, toPeers: session.connectedPeers, with: .unreliable)
         }
 
         let msg = ChatMessage(text: nil, audioData: data, sender: "Me", time: Date())
@@ -104,21 +105,31 @@ extension MultipeerManager: MCSessionDelegate, MCNearbyServiceAdvertiserDelegate
     }
 
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
-        if let stringData = String(data: data.prefix(300), encoding: .utf8),
-           stringData.starts(with: "VOICE|") {
-            
-            // Extract room key
-            let components = stringData.components(separatedBy: "|")
-            guard components.count >= 3 else { return }
-            let room = components[1]
-            let headerByteCount = ("VOICE|\(room)|" as NSString).lengthOfBytes(using: String.Encoding.utf8.rawValue)
-            let audioData = data.dropFirst(headerByteCount)
+        let prefix = "VOICE|".data(using: .utf8)!
 
-            let msg = ChatMessage(text: nil, audioData: Data(audioData), sender: peerID.displayName, time: Date())
-            DispatchQueue.main.async {
-                self.messagesByRoom[room, default: []].append(msg)
+        if data.starts(with: prefix) {
+            // Manually find the indices of the first and second pipes
+            if let firstPipeIndex = data.firstIndex(of: UInt8(ascii: "|")),
+               let secondPipeIndex = data[firstPipeIndex+1..<data.count].firstIndex(of: UInt8(ascii: "|")) {
+
+                let headerEndIndex = secondPipeIndex + 1
+                let headerData = data.prefix(headerEndIndex)
+
+                if let headerString = String(data: headerData, encoding: .utf8),
+                   headerString.hasPrefix("VOICE|"),
+                   headerString.components(separatedBy: "|").count >= 3 {
+
+                    let components = headerString.components(separatedBy: "|")
+                    let room = components[1]
+                    let audioData = data.subdata(in: headerEndIndex..<data.count)
+
+                    let msg = ChatMessage(text: nil, audioData: audioData, sender: peerID.displayName, time: Date())
+                    DispatchQueue.main.async {
+                        self.messagesByRoom[room, default: []].append(msg)
+                    }
+                    return
+                }
             }
-            return
         }
 
         // Handle text message
@@ -132,6 +143,7 @@ extension MultipeerManager: MCSessionDelegate, MCNearbyServiceAdvertiserDelegate
             }
         }
     }
+
 
     func session(_ session: MCSession, didReceive stream: InputStream, withName: String, fromPeer: MCPeerID) {}
     func session(_ session: MCSession, didStartReceivingResourceWithName: String, fromPeer: MCPeerID, with: Progress) {}
