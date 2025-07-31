@@ -1,11 +1,3 @@
-//
-//  UsernameManager.swift
-//  ChAir
-//
-//  Created by Atharv  on 13/07/25.
-//
-
-
 import Foundation
 
 class UsernameManager {
@@ -20,7 +12,10 @@ class UsernameManager {
         if let saved = UserDefaults.standard.string(forKey: "username") {
             username = saved
         } else {
-            let newName = "\(adjectives.randomElement()!)\(animals.randomElement()!)"
+            let adjective = adjectives.randomElement()!
+            let animal = animals.randomElement()!
+            let number = Int.random(in: 100...999)
+            let newName = "\(adjective)\(animal)\(number)"
             username = newName
             UserDefaults.standard.set(newName, forKey: "username")
         }
