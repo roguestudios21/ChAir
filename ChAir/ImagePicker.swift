@@ -2,12 +2,12 @@ import SwiftUI
 import PhotosUI
 
 struct ImagePicker: UIViewControllerRepresentable {
-    @Binding var image: UIImage?
+    @Binding var images: [UIImage]
 
     func makeUIViewController(context: Context) -> PHPickerViewController {
         var config = PHPickerConfiguration()
         config.filter = .images
-        config.selectionLimit = 1
+        config.selectionLimit = 5
 
         let picker = PHPickerViewController(configuration: config)
         picker.delegate = context.coordinator
@@ -29,14 +29,25 @@ struct ImagePicker: UIViewControllerRepresentable {
 
         func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
             picker.dismiss(animated: true)
-            guard let provider = results.first?.itemProvider, provider.canLoadObject(ofClass: UIImage.self) else { return }
 
-            provider.loadObject(ofClass: UIImage.self) { object, error in
-                if let image = object as? UIImage {
-                    DispatchQueue.main.async {
-                        self.parent.image = image
+            let group = DispatchGroup()
+            var selectedImages = [UIImage]()
+
+            for result in results {
+                guard result.itemProvider.canLoadObject(ofClass: UIImage.self) else { continue }
+
+                group.enter()
+                result.itemProvider.loadObject(ofClass: UIImage.self) { object, error in
+                    defer { group.leave() }
+
+                    if let image = object as? UIImage {
+                        selectedImages.append(image)
                     }
                 }
+            }
+
+            group.notify(queue: .main) {
+                self.parent.images = selectedImages
             }
         }
     }

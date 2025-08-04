@@ -1,35 +1,37 @@
 import SwiftUI
 import UniformTypeIdentifiers
+import UIKit
 
 struct FilePicker: UIViewControllerRepresentable {
-    var onFilePicked: (URL) -> Void
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(onFilePicked: onFilePicked)
-    }
+    var onPicked: ([URL]) -> Void
 
     func makeUIViewController(context: Context) -> UIDocumentPickerViewController {
         let supportedTypes: [UTType] = [.pdf, .plainText]
         let picker = UIDocumentPickerViewController(forOpeningContentTypes: supportedTypes, asCopy: true)
         picker.delegate = context.coordinator
-        picker.allowsMultipleSelection = false
+        picker.allowsMultipleSelection = true
         return picker
     }
 
     func updateUIViewController(_ uiViewController: UIDocumentPickerViewController, context: Context) {}
 
-    class Coordinator: NSObject, UIDocumentPickerDelegate {
-        var onFilePicked: (URL) -> Void
+    func makeCoordinator() -> Coordinator {
+        Coordinator(onPicked: onPicked)
+    }
 
-        init(onFilePicked: @escaping (URL) -> Void) {
-            self.onFilePicked = onFilePicked
+    class Coordinator: NSObject, UIDocumentPickerDelegate {
+        var onPicked: ([URL]) -> Void
+
+        init(onPicked: @escaping ([URL]) -> Void) {
+            self.onPicked = onPicked
         }
 
         func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
-            guard let selectedFileURL = urls.first else { return }
-            onFilePicked(selectedFileURL)
+            onPicked(urls)
         }
 
-        func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {}
+        func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
+            onPicked([])
+        }
     }
 }

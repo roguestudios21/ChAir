@@ -4,7 +4,7 @@ import Combine
 
 class AudioRecorderManager: NSObject, AVAudioRecorderDelegate, ObservableObject {
     @Published var isRecording = false
-    @Published var recordingTimeLeft = 8
+    @Published var recordingTimeLeft = 30
 
     private var audioRecorder: AVAudioRecorder?
     private var timer: Timer?
@@ -21,7 +21,7 @@ class AudioRecorderManager: NSObject, AVAudioRecorderDelegate, ObservableObject 
 
         let settings = [
             AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
-            AVSampleRateKey: 8000,
+            AVSampleRateKey: 12000,
             AVNumberOfChannelsKey: 1,
             AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
         ]
@@ -31,9 +31,9 @@ class AudioRecorderManager: NSObject, AVAudioRecorderDelegate, ObservableObject 
         do {
             audioRecorder = try AVAudioRecorder(url: fileURL, settings: settings)
             audioRecorder?.delegate = self
-            audioRecorder?.record(forDuration: 8)
+            audioRecorder?.record(forDuration: 30)
             isRecording = true
-            recordingTimeLeft = 8
+            recordingTimeLeft = 30
 
             timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
                 guard let self = self else { return }
